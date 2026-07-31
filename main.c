@@ -1,4 +1,32 @@
+#include <fcntl.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <termios.h>
+
+struct termios    *setup(struct termios *old)
+{
+    struct termios raw;
+
+    tcgetattr(STDIN_FILENO, &raw);//permet de recuperer les attributs du terminal
+    tcgetattr(STDIN_FILENO, old);
+    raw.c_lflag &= ~(ECHO | ICANON);//desactive le mode canonique
+    raw.c_cc[VMIN] = 0;//nombre min de caractere a recevoir
+    raw.c_cc[VTIME] = 0;//attente a 0
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);//defini les attributs terminal
+    return (old);
+}
+
+int    get_key(char *buff, int length)
+{
+    int nb = read(0, buff, length);
+    return (nb);
+}
+
+void    print_key(char    *buff, int size)
+{
+    printf("lettre : %d, %d, %d, %d\n", buff[0], buff[1], buff[2], size);
+    fflush(stdout);//vide le tampon de sortie (merci google)
+}
 
 int	ft_pow(float nb, int pow)
 {
@@ -38,17 +66,11 @@ int	ft_atoi(char *nbr)
 	return (res);
 }
 
-int	main(int argc, char **argv)
+void	ft_print_img(int nb)
 {
-	int (nb) = ft_atoi(argv[1]);
 	int (i) = 0;
 	int (j) = 0;
 	int (k) = 0;
-	if (argc < 2 || nb < 0 || nb > 40)
-	{
-		write(1, "Relancez en entrant uniquement 1 argument numerique compris entre 1 et 40\n", 74);
-		return (1);
-	}
 	while (i < nb)
 	{
 		ft_put_spaces(k);
@@ -69,6 +91,38 @@ int	main(int argc, char **argv)
 		}
 		i++;
 		k++;
+	}
+}
+
+int	main(int argc, char **argv)
+{
+	int (nb) = ft_atoi(argv[1]);
+
+	struct termios	old;
+	char	c[3];
+	old = *setup(&old);
+	while (1)
+	{
+		int size = get_key(c, 3);
+		if (size && c[2] == 67)
+		{
+			x += 1;
+			ft_print_img(nb);
+		}
+		if (size && c[2] == 68)
+		{
+			x -= 1;
+			ft_print_img(nb);
+		}
+	}
+	tcsetattr(STDIN_FILENO, TCSAFLUSH, &old);
+	
+	
+	
+	if (argc < 2 || nb < 0 || nb > 40)
+	{
+		write(1, "Relancez en entrant uniquement 1 argument numerique compris entre 1 et 40\n", 74);
+		return (1);
 	}
 	return 0;
 }
