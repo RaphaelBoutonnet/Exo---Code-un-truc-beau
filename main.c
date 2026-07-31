@@ -43,6 +43,15 @@ int	ft_pow(float nb, int pow)
 	return (res);
 }
 
+void	ft_put_simple_spaces(int x)
+{
+	while (x > 0)
+	{
+		write(1, " ", 1);
+		x--;
+	}
+}
+
 void	ft_put_spaces(int i)
 {
 	int (j) = ft_pow(1.4, i);
@@ -66,13 +75,14 @@ int	ft_atoi(char *nbr)
 	return (res);
 }
 
-void	ft_print_img(int nb)
+void	ft_print_img(int nb, int offset)
 {
 	int (i) = 0;
 	int (j) = 0;
 	int (k) = 0;
 	while (i < nb)
 	{
+		ft_put_simple_spaces(offset);
 		ft_put_spaces(k);
 		write(1, "o\n", 2);
 		if (k % 7 == 0 && k > 0)
@@ -82,6 +92,7 @@ void	ft_print_img(int nb)
 			j = k;
 			while (k % 7 != 0)
 			{
+				ft_put_simple_spaces(offset);
 				ft_put_spaces(j - (k - j));
 				write(1, "o\n", 2);
 				i++;
@@ -97,6 +108,7 @@ void	ft_print_img(int nb)
 int	main(int argc, char **argv)
 {
 	int (nb) = ft_atoi(argv[1]);
+	int x = 0;
 
 	struct termios	old;
 	char	c[3];
@@ -106,13 +118,17 @@ int	main(int argc, char **argv)
 		int size = get_key(c, 3);
 		if (size && c[2] == 67)
 		{
+			if (x < 0)
+				x = 0;
 			x += 1;
-			ft_print_img(nb);
+			ft_print_img(nb, x);
 		}
 		if (size && c[2] == 68)
 		{
+			if (x < 0)
+				x = 0;
 			x -= 1;
-			ft_print_img(nb);
+			ft_print_img(nb, x);
 		}
 	}
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &old);
